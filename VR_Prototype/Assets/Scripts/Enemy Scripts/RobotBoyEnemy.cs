@@ -2,95 +2,71 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using HutongGames.PlayMaker;
 
 public class RobotBoyEnemy : MonoBehaviour
 {
-    [SerializeField] float chaseRadius = 5f;
-    [SerializeField] float rotationSpeed = 5f;
+    [SerializeField] float chaseRadius = 8f;
 
-    private float distanceToTarget = Mathf.Infinity;
-
-    // temp set to true for testing
-    bool enemyIsAggroed = false;
+    float distanceToTarget = Mathf.Infinity;
+    Transform playerPosition;
+    Vector3 startingPosition;
 
     NavMeshAgent navMeshAgent;
-    EnemyHealth health;
-    CapsuleCollider capsuleCollider;
-    Transform target;
+
+
+    // testing
+    bool chasingPlayer = true;
+    bool caughtPlayer = false;
 
     // Start is called before the first frame update
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        health = GetComponent<EnemyHealth>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        target = FindObjectOfType<Player>().transform;
+        playerPosition = FindObjectOfType<Player>().transform;
+        startingPosition = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (health.IsDead())
+        if (chasingPlayer)
         {
-            capsuleCollider.enabled = false;
-            enabled = false;
-            navMeshAgent.enabled = false;
+            ChasePlayer();
         }
-
-        distanceToTarget = Vector3.Distance(target.position, transform.position);
-        if (enemyIsAggroed)
+        else if (caughtPlayer)
         {
-            EngageTarget();
+            navMeshAgent.SetDestination(startingPosition);
+            if (Vector2.Distance(this.transform.position, startingPosition) <= .2)
+            {
+                Debug.Log("MADE IT");
+                BotTransportUpTest();
+                PlayMakerFSM.BroadcastEvent("testingEvent");
+            }
         }
-        else if (distanceToTarget <= chaseRadius)
-        {
-            enemyIsAggroed = true;
-        }
-    }
-
-    public void OnDamageTaken()
-    {
-        enemyIsAggroed = true;
-    }
-
-    private void EngageTarget()
-    {
-        FaceTarget();
-        if (distanceToTarget >= navMeshAgent.stoppingDistance)
-        {
-            ChaseTarget();
-        }
+        
+        distanceToTarget = Vector3.Distance(this.transform.position, playerPosition.position);
         if (distanceToTarget <= navMeshAgent.stoppingDistance)
         {
-            AttackTarget();
+            chasingPlayer = false;
+            caughtPlayer = true;
+            // stopping distance needs to be set to 0 because it won't go all the way to its starting destination
+            navMeshAgent.stoppingDistance = 0;
         }
+        
+        
     }
 
-    private void ChaseTarget()
+    void ChasePlayer()
     {
-        GetComponent<Animator>().SetBool("attack", false);
         GetComponent<Animator>().SetTrigger("move");
-        if (!health.IsDead())
-        {
-            navMeshAgent.SetDestination(target.position);
-        }
+        navMeshAgent.SetDestination(playerPosition.position);
     }
 
-    private void AttackTarget()
+    
+    void BotTransportUpTest()
     {
-        GetComponent<Animator>().SetBool("attack", true);
+        GetComponent<Animator>().SetTrigger("backToIdle");
     }
-
-    private void FaceTarget()
-    {
-        Vector3 direction = (target.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, chaseRadius);
-    }
+    
 }
