@@ -30,6 +30,10 @@ public class RobotBoyEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // temp
+        //transform.LookAt(playerPosition);
+        // ^^^
+
         if (chasingPlayer)
         {
             ChasePlayer();
