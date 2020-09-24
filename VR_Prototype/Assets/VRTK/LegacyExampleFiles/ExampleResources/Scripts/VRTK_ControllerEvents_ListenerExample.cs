@@ -270,21 +270,29 @@
             VRTK_Logger.Info(debugString);
         }
 
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------
+
         private void DoTriggerPressed(object sender, ControllerInteractionEventArgs e)
         {
+            //FindObjectOfType<Player>().Shoot();
             if (triggerButtonEvents)
             {
                 DebugLogger(VRTK_ControllerReference.GetRealIndex(e.controllerReference), "TRIGGER", "pressed", e);
             }
-        }
+        }  
 
         private void DoTriggerReleased(object sender, ControllerInteractionEventArgs e)
         {
+            //FindObjectOfType<Player>().StopFiringLaser();
             if (triggerButtonEvents)
             {
                 DebugLogger(VRTK_ControllerReference.GetRealIndex(e.controllerReference), "TRIGGER", "released", e);
             }
         }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------
 
         private void DoTriggerTouchStart(object sender, ControllerInteractionEventArgs e)
         {
@@ -510,8 +518,13 @@
             }
         }
 
+        // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
         private void DoButtonTwoPressed(object sender, ControllerInteractionEventArgs e)
         {
+            //FindObjectOfType<Player>().ActivateWeapon();
             if (buttonTwoButtonEvents)
             {
                 DebugLogger(VRTK_ControllerReference.GetRealIndex(e.controllerReference), "BUTTON TWO", "pressed down", e);
