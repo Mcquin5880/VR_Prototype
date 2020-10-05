@@ -6,6 +6,7 @@ using HutongGames.PlayMaker;
 
 public class RobotBoyEnemy : MonoBehaviour
 {
+    [SerializeField] GameObject transportParent;
     [SerializeField] float chaseRadius = 8f;
 
     float distanceToTarget = Mathf.Infinity;
@@ -14,10 +15,19 @@ public class RobotBoyEnemy : MonoBehaviour
 
     NavMeshAgent navMeshAgent;
 
+    // for current RB implementation, all enemies are sent back to original destination as soon as a single one catches the player
+    private bool chasingPlayer = true;
+    private bool caughtPlayer = false;
 
-    // testing
-    bool chasingPlayer = true;
-    bool caughtPlayer = false;
+    public void SetChasingPlayer(bool value)
+    {
+        this.chasingPlayer = value;
+    }
+
+    public void SetCaughtPlayer(bool  value)
+    {
+        this.caughtPlayer = value;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -30,47 +40,54 @@ public class RobotBoyEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // temp
-        //transform.LookAt(playerPosition);
-        // ^^^
-
         if (chasingPlayer)
         {
-            ChasePlayer();
+            ChaseAndCatchPlayer();
         }
         else if (caughtPlayer)
         {
             navMeshAgent.SetDestination(startingPosition);
             if (Vector2.Distance(this.transform.position, startingPosition) <= .2)
             {
-                Debug.Log("MADE IT");
-                BotTransportUpTest();
-                PlayMakerFSM.BroadcastEvent("testingEvent");
+                Debug.Log(gameObject.name + " made it back to original destination");
+                RobotBoyTransportUp();
             }
-        }
-        
-        distanceToTarget = Vector3.Distance(this.transform.position, playerPosition.position);
-        if (distanceToTarget <= navMeshAgent.stoppingDistance)
-        {
-            chasingPlayer = false;
-            caughtPlayer = true;
-            // stopping distance needs to be set to 0 because it won't go all the way to its starting destination
-            navMeshAgent.stoppingDistance = 0;
-        }
-        
+        }   
         
     }
 
-    void ChasePlayer()
+    void ChaseAndCatchPlayer()
     {
         GetComponent<Animator>().SetTrigger("move");
         navMeshAgent.SetDestination(playerPosition.position);
+
+        distanceToTarget = Vector3.Distance(this.transform.position, playerPosition.position);
+        if (distanceToTarget <= navMeshAgent.stoppingDistance)
+        {
+            SendAllRobotBoysBackToSpawnPosition();
+        }
     }
 
     
-    void BotTransportUpTest()
+    void RobotBoyTransportUp()
     {
         GetComponent<Animator>().SetTrigger("backToIdle");
+        transportParent.GetComponent<PlayMakerFSM>().SendEvent("testingEvent");
+    }
+
+    public void SendAllRobotBoysBackToSpawnPosition()
+    {
+        RobotBoyEnemy[] rbArray = FindObjectsOfType<RobotBoyEnemy>();
+        Debug.Log("Made it here, bot count: " + rbArray.Length);
+
+        foreach (RobotBoyEnemy rb in rbArray)
+        {
+            rb.SetChasingPlayer(false);
+            rb.SetCaughtPlayer(true);
+            // for future reference, tried different methods for setting the stopping distance to 0 for all robot boys in scene
+            // and this is the only method that would work
+            rb.navMeshAgent.stoppingDistance = 0;
+        }
     }
     
 }
