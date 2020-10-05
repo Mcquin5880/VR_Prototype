@@ -79,6 +79,8 @@ public class RobotBoyEnemy : MonoBehaviour
         // sending FSM event to specific FSM on "transportParent" serializedfield object
         transportParent.GetComponent<PlayMakerFSM>().SendEvent("testingEvent");
 
+        navMeshAgent.speed = 0;
+
         //navMeshAgent.enabled = false;
     }
 
@@ -94,6 +96,9 @@ public class RobotBoyEnemy : MonoBehaviour
             // for future reference, tried different methods for setting the stopping distance to 0 for all robot boys in scene
             // and this is the only method that would work
             rb.navMeshAgent.stoppingDistance = 0;
+
+            rb.GetComponent<Animator>().SetTrigger("run");
+            rb.navMeshAgent.speed = 4.5f;
         }
     }
     

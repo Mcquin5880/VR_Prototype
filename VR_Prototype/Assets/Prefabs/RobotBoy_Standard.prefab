@@ -1254,7 +1254,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.2
-  m_Speed: 3
+  m_Speed: 3.6
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 1600
@@ -1279,6 +1279,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chaseRadius: 8
+  transportParent: {fileID: 0}
+  noComponentsRobotBoy: {fileID: 0}
 --- !u!1 &8112562832000815712
 GameObject:
   m_ObjectHideFlags: 0
