@@ -6,14 +6,15 @@ using HutongGames.PlayMaker;
 
 public class RobotBoyEnemy : MonoBehaviour
 {
-    [SerializeField] GameObject transportParent;
     [SerializeField] float chaseRadius = 8f;
-
     float distanceToTarget = Mathf.Infinity;
     Transform playerPosition;
     Vector3 startingPosition;
-
     NavMeshAgent navMeshAgent;
+
+    // used to single out FSM compontent on parent transport cylinder object
+    [SerializeField] GameObject transportParent;
+    [SerializeField] GameObject noComponentsRobotBoy;
 
     // for current RB implementation, all enemies are sent back to original destination as soon as a single one catches the player
     private bool chasingPlayer = true;
@@ -28,6 +29,9 @@ public class RobotBoyEnemy : MonoBehaviour
     {
         this.caughtPlayer = value;
     }
+
+    // testing
+    Transform positionBeforeTransportBackUp;
 
     // Start is called before the first frame update
     void Start()
@@ -72,7 +76,10 @@ public class RobotBoyEnemy : MonoBehaviour
     void RobotBoyTransportUp()
     {
         GetComponent<Animator>().SetTrigger("backToIdle");
+        // sending FSM event to specific FSM on "transportParent" serializedfield object
         transportParent.GetComponent<PlayMakerFSM>().SendEvent("testingEvent");
+
+        //navMeshAgent.enabled = false;
     }
 
     public void SendAllRobotBoysBackToSpawnPosition()
